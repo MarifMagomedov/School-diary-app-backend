@@ -63,3 +63,10 @@ class Database:
         async with session_factory() as session:
             cls = await session.get(Class, class_id)
             return cls
+
+    @staticmethod
+    async def delete_item(table, teacher_id: UUID4):
+        async with session_factory() as session:
+            await session.delete(table, teacher_id)
+            await session.flush()
+            await session.commit()

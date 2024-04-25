@@ -125,6 +125,6 @@ async def init_classes():
             classes.append(_class)
         session.add_all(classes)
         await session.commit()
-#
+# #
 #
 # asyncio.run(init_classes())

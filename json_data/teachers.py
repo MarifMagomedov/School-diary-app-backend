@@ -7,23 +7,23 @@ def json_teachers(teachers: list[Teacher]) -> list[dict]:
     for teacher in teachers:
 
         teacher_json = {
-            'id': teacher.teacher_id,
+            'id': teacher.id,
             'name': teacher.name,
             'surname': teacher.surname,
             'middle_name': teacher.middle_name,
             'email': teacher.email,
             'teacher_class': {
-                'class_id': teacher.teacher_class.class_id,
+                'id': teacher.teacher_class.id,
                 'class_number': teacher.teacher_class.class_number,
                 'class_word': teacher.teacher_class.class_word
             } if teacher.teacher_class else {},
-            'subjects': [
-                {
-                    'subject_id': subject.subject_id,
-                    'subject_name': subject.subject_name
-                }
-                for subject in teacher.subjects
-            ]
+            # 'subjects': [
+            #     {
+            #         'id': subject.id,
+            #         'subject_name': subject.subject_name
+            #     }
+            #     for subject in teacher.subjects
+            # ]
         }
         response_data.append(teacher_json)
 

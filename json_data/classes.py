@@ -5,13 +5,7 @@ def json_classes(classes: list[Class]) -> list[dict]:
     response_data = []
 
     for cls in classes:
-        class_json = {
-            'class_id': cls.class_id,
-            'class_number': cls.class_number,
-            'class_word': cls.class_word,
-            'classroom_teacher': cls.classroom_teacher.name,
-        }
-        response_data.append(class_json)
+        response_data.append(json_class(cls))
 
     return response_data
 
@@ -19,10 +13,10 @@ def json_classes(classes: list[Class]) -> list[dict]:
 def json_class(cls: Class) -> dict:
 
     class_json = {
-        'class_id': cls.class_id,
+        'id': cls.id,
         'class_number': cls.class_number,
         'class_word': cls.class_word,
-        'classroom_teacher': cls.classroom_teacher.name,
+        'classroom_teacher': cls.classroom_teacher.name if cls.classroom_teacher else None,
     }
 
     return class_json

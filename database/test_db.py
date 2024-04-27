@@ -65,7 +65,7 @@ def init_students():
         surname = choice(surnames)
         middle_name = choice(middle_names)
         student = Student(
-            student_id=user_id,
+            id=user_id,
             name=name,
             surname=surname,
             middle_name=middle_name,
@@ -79,7 +79,7 @@ def init_students():
         surname = choice(surnames)
         middle_name = choice(middle_names)
         teacher = Teacher(
-            teacher_id=user_id,
+            id=user_id,
             name=name,
             surname=surname,
             middle_name=middle_name,
@@ -114,7 +114,7 @@ async def init_classes():
         for number, word, teacher in zip(number, words, teachers):
             s = [students.pop() for i in range(10)]
             _class = Class(
-                class_id=uuid4(),
+                id=uuid4(),
                 class_number=number,
                 class_word=word,
                 classroom_teacher=teacher,
@@ -125,6 +125,6 @@ async def init_classes():
             classes.append(_class)
         session.add_all(classes)
         await session.commit()
-# #
-#
-# asyncio.run(init_classes())
+
+
+asyncio.run(init_classes())

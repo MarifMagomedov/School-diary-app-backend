@@ -1,5 +1,5 @@
 from pydantic import UUID4
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from sqlalchemy.orm import joinedload
 
 from .models import Base, Student, Teacher, Subject, Class
@@ -36,7 +36,7 @@ class Database:
             await session.commit()
 
     @staticmethod
-    async def get_all_table_items(table):
+    async def get_all_table_items(table) -> list[Teacher | Subject | Class | Student]:
         async with session_factory() as session:
             query = select(table)
             items = await session.execute(query)
@@ -50,7 +50,7 @@ class Database:
             return items.scalars().all()
 
     @staticmethod
-    async def get_subject_teachers(subject_name: str):
+    async def get_subject_teachers(subject_name: str) -> list[Teacher]:
         async with session_factory() as session:
             query = select(Teacher).join(Subject).where(
                 Subject.subject_name == subject_name
@@ -59,14 +59,16 @@ class Database:
             return teachers.unique().scalars().all()
 
     @staticmethod
-    async def get_class(class_id):
+    async def get_class(class_id: UUID4):
         async with session_factory() as session:
             cls = await session.get(Class, class_id)
             return cls
 
     @staticmethod
-    async def delete_item(table, teacher_id: UUID4):
+    async def delete_teacher(teacher_id: UUID4):
         async with session_factory() as session:
-            await session.delete(table, teacher_id)
-            await session.flush()
+            teacher = await session.get(Teacher, teacher_id)
+            teacher.subjects = []
+            await session.delete(teacher)
             await session.commit()
+            return teacher

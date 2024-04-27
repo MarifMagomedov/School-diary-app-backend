@@ -25,7 +25,7 @@ class Base(DeclarativeBase):
 class Subject(Base):
     __tablename__ = 'subjects'
 
-    subject_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     subject_name: Mapped[str]
 
     students: Mapped[list['Student']] = relationship(
@@ -36,28 +36,28 @@ class Subject(Base):
         back_populates='subject', uselist=True, cascade='all,delete'
     )
     teacher: Mapped['Teacher'] = relationship(
-        back_populates='subjects', uselist=False, cascade='all,delete'
+        back_populates='subjects', uselist=False
     )
-    teacher_fk: Mapped[int] = mapped_column(ForeignKey('teachers.teacher_id'))
+    teacher_fk: Mapped[int] = mapped_column(ForeignKey('teachers.id'), nullable=True)
 
 
 class Mark(Base):
     __tablename__ = 'marks'
 
-    mark_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     mark_value: Mapped[int]
     date: Mapped[datetime]
     subject: Mapped['Subject'] = relationship(back_populates='marks', uselist=False)
     student: Mapped['Student'] = relationship(back_populates='marks', uselist=False)
 
-    subject_fk: Mapped[int] = mapped_column(ForeignKey('subjects.subject_id'))
-    student_fk: Mapped[int] = mapped_column(ForeignKey('students.student_id'))
+    subject_fk: Mapped[int] = mapped_column(ForeignKey('subjects.id'))
+    student_fk: Mapped[int] = mapped_column(ForeignKey('students.id'))
 
 
 class Student(Base, Person):
     __tablename__ = 'students'
 
-    student_id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
+    id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
     private: Mapped[bool] = mapped_column(default=False)
 
     subjects: Mapped[list['Subject']] = relationship(
@@ -70,60 +70,68 @@ class Student(Base, Person):
     student_class: Mapped['Class'] = relationship(
         back_populates='students', uselist=False, cascade='all,delete'
     )
-    class_fk: Mapped[int] = mapped_column(ForeignKey('classes.class_id'))
+    class_fk: Mapped[int] = mapped_column(ForeignKey('classes.id'), nullable=True)
 
 
 class Class(Base):
     __tablename__ = 'classes'
 
-    class_id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
+    id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
     class_number: Mapped[int]
     class_word: Mapped[str]
 
-    classroom_teacher: Mapped['Teacher'] = relationship(back_populates='teacher_class', lazy='subquery')
+    classroom_teacher: Mapped['Teacher'] = relationship(
+        back_populates='teacher_class',
+        lazy='subquery'
+    )
     teachers: Mapped[list['Teacher']] = relationship(
         back_populates='classes', uselist=True,
         secondary='teacher_classes', cascade='all,delete'
     )
     students: Mapped[list['Student']] = relationship(
-        back_populates='student_class', uselist=True, cascade='all,delete'
+        back_populates='student_class', uselist=True,
+        cascade='all,delete'
     )
 
 
 class Teacher(Base, Person):
     __tablename__ = 'teachers'
 
-    teacher_id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
+    id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
 
-    subjects: Mapped[list['Subject']] = relationship(back_populates='teacher', uselist=True, lazy='joined')
+    subjects: Mapped[list['Subject']] = relationship(
+        back_populates='teacher', uselist=True,
+        lazy='joined', cascade='all, delete'
+    )
     classes: Mapped[list['Class']] = relationship(
         back_populates='teachers', uselist=False,
-        secondary='teacher_classes', cascade='all,delete'
+        secondary='teacher_classes', cascade='all,delete',
+        lazy='subquery'
     )
     teacher_class: Mapped['Class'] = relationship(
         back_populates='classroom_teacher',
-        cascade='all,delete', lazy='subquery'
+        lazy='subquery'
     )
-    class_fk: Mapped[Optional[int]] = mapped_column(ForeignKey('classes.class_id'))
+    class_fk: Mapped[Optional[int]] = mapped_column(ForeignKey('classes.id'), nullable=True)
 
 
 class TeacherClass(Base):
     __tablename__ = 'teacher_classes'
 
-    teacher_fk = mapped_column(ForeignKey('teachers.teacher_id'), primary_key=True)
-    class_fk = mapped_column(ForeignKey('classes.class_id'), primary_key=True)
+    teacher_fk = mapped_column(ForeignKey('teachers.id'), primary_key=True)
+    class_fk = mapped_column(ForeignKey('classes.id'), primary_key=True)
 
 
 class TeacherSubject(Base):
     __tablename__ = 'teacher_subjects'
 
-    teacher_fk = mapped_column(ForeignKey('teachers.teacher_id'), primary_key=True)
-    subject_fk = mapped_column(ForeignKey('subjects.subject_id'), primary_key=True)
+    teacher_fk = mapped_column(ForeignKey('teachers.id'), primary_key=True)
+    subject_fk = mapped_column(ForeignKey('subjects.id'), primary_key=True)
 
 
 class StudentSubject(Base):
     __tablename__ = 'student_subjects'
 
-    student_fk = mapped_column(ForeignKey('students.student_id'), primary_key=True)
-    subject_fk = mapped_column(ForeignKey('subjects.subject_id'), primary_key=True)
+    student_fk = mapped_column(ForeignKey('students.id'), primary_key=True)
+    subject_fk = mapped_column(ForeignKey('subjects.id'), primary_key=True)
 

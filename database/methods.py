@@ -1,7 +1,10 @@
+from uuid import uuid4
+
 from pydantic import UUID4
 from sqlalchemy import select, delete
 from sqlalchemy.orm import joinedload
 
+from teachers.schemas import AddNewTeacherSchema
 from .models import Base, Student, Teacher, Subject, Class
 from .connection import session_factory, engine
 
@@ -40,23 +43,13 @@ class Database:
         async with session_factory() as session:
             query = select(table)
             items = await session.execute(query)
-            return items.scalars().all()
+            return items.unique().scalars().all()
 
     @staticmethod
-    async def get_all_subjects() -> list[Subject]:
+    async def get_subject_teachers(subject_id: int) -> list[Teacher]:
         async with session_factory() as session:
-            query = select(Subject).distinct(Subject.subject_name)
-            items = await session.execute(query)
-            return items.scalars().all()
-
-    @staticmethod
-    async def get_subject_teachers(subject_name: str) -> list[Teacher]:
-        async with session_factory() as session:
-            query = select(Teacher).join(Subject).where(
-                Subject.subject_name == subject_name
-            )
-            teachers = await session.execute(query)
-            return teachers.unique().scalars().all()
+            subject = await session.get(Subject, subject_id)
+            return subject.teachers
 
     @staticmethod
     async def get_class(class_id: UUID4):
@@ -68,7 +61,17 @@ class Database:
     async def delete_teacher(teacher_id: UUID4):
         async with session_factory() as session:
             teacher = await session.get(Teacher, teacher_id)
-            teacher.subjects = []
             await session.delete(teacher)
             await session.commit()
-            return teacher
+
+    @staticmethod
+    async def add_teacher(form: AddNewTeacherSchema):
+        async with session_factory() as session:
+            subject = await session.get(Subject, form.subjects)
+            form.subjects = [subject]
+            teacher = Teacher(
+                id=uuid4(),
+                **form.model_dump()
+            )
+            session.add(teacher)
+            await session.commit()

@@ -29,14 +29,20 @@ class Subject(Base):
     subject_name: Mapped[str]
 
     students: Mapped[list['Student']] = relationship(
-        back_populates='subjects', secondary='student_subjects',
-        uselist=False, cascade='all,delete'
+        back_populates='subjects',
+        secondary='student_subjects',
+        uselist=False,
+        cascade='all,delete'
     )
     marks: Mapped[list['Mark']] = relationship(
         back_populates='subject', uselist=True, cascade='all,delete'
     )
-    teacher: Mapped['Teacher'] = relationship(
-        back_populates='subjects', uselist=False
+    teachers: Mapped[list['Teacher']] = relationship(
+        back_populates='subjects',
+        uselist=True,
+        secondary='teacher_subjects',
+        lazy='joined',
+        cascade='all, delete'
     )
     teacher_fk: Mapped[int] = mapped_column(ForeignKey('teachers.id'), nullable=True)
 
@@ -61,14 +67,19 @@ class Student(Base, Person):
     private: Mapped[bool] = mapped_column(default=False)
 
     subjects: Mapped[list['Subject']] = relationship(
-        back_populates='students', secondary='student_subjects',
+        back_populates='students',
+        secondary='student_subjects',
         uselist=True
     )
     marks: Mapped[list['Mark']] = relationship(
-        back_populates='student', uselist=True, cascade='all,delete'
+        back_populates='student',
+        uselist=True,
+        cascade='all,delete'
     )
     student_class: Mapped['Class'] = relationship(
-        back_populates='students', uselist=False, cascade='all,delete'
+        back_populates='students',
+        uselist=False,
+        cascade='all,delete'
     )
     class_fk: Mapped[int] = mapped_column(ForeignKey('classes.id'), nullable=True)
 
@@ -85,11 +96,14 @@ class Class(Base):
         lazy='subquery'
     )
     teachers: Mapped[list['Teacher']] = relationship(
-        back_populates='classes', uselist=True,
-        secondary='teacher_classes', cascade='all,delete'
+        back_populates='classes',
+        uselist=True,
+        secondary='teacher_classes',
+        cascade='all,delete'
     )
     students: Mapped[list['Student']] = relationship(
-        back_populates='student_class', uselist=True,
+        back_populates='student_class',
+        uselist=True,
         cascade='all,delete'
     )
 
@@ -100,12 +114,15 @@ class Teacher(Base, Person):
     id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
 
     subjects: Mapped[list['Subject']] = relationship(
-        back_populates='teacher', uselist=True,
-        lazy='joined', cascade='all, delete'
+        back_populates='teachers',
+        secondary='teacher_subjects',
+        uselist=True
     )
     classes: Mapped[list['Class']] = relationship(
-        back_populates='teachers', uselist=False,
-        secondary='teacher_classes', cascade='all,delete',
+        back_populates='teachers',
+        uselist=False,
+        secondary='teacher_classes',
+        cascade='all,delete',
         lazy='subquery'
     )
     teacher_class: Mapped['Class'] = relationship(

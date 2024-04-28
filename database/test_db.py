@@ -26,7 +26,7 @@ subjects_names = [
     'Обществознание', 'Математика', 'Информатика',
     'История', 'ОБЖ', 'Русский язык', 'Английский язык',
     'Физика', 'Физическая культура', "Программирование",
-    'Обществознание', 'Математика', 'История', 'Английский язык'
+    'История'
 ]
 
 
@@ -44,18 +44,17 @@ def init_marks():
     return marks
 
 
-def init_subjects(teachers):
+def init_subjects():
     subjects = []
-    for subject, teacher in zip(subjects_names, teachers):
+    for subject in subjects_names:
         subject = Subject(
-            subject_name=subject,
-            teacher=teacher
+            subject_name=subject
         )
         subjects.append(subject)
     return subjects
 
 
-def init_students():
+def init_students(subjects: list[Subject]):
     students = []
     teachers = []
 
@@ -73,7 +72,7 @@ def init_students():
         )
         students.append(student)
 
-    while len(teachers) <= len(subjects_names):
+    for subject in subjects:
         user_id = uuid4()
         name = choice(names)
         surname = choice(surnames)
@@ -83,16 +82,17 @@ def init_students():
             name=name,
             surname=surname,
             middle_name=middle_name,
-            age=choice(range(30, 70))
+            age=choice(range(30, 70)),
         )
+        teacher.subjects.append(subject)
         teachers.append(teacher)
     return students, teachers
 
 
 async def init_classes():
     await Database.create_tables()
-    students, teachers = init_students()
-    subjects = init_subjects(teachers)
+    subjects = init_subjects()
+    students, teachers = init_students(subjects)
     marks = init_marks()
 
     for i in range(len(students)):

@@ -11,6 +11,7 @@ def json_teachers(teachers: list[Teacher]) -> list[dict]:
             'name': teacher.name,
             'surname': teacher.surname,
             'middle_name': teacher.middle_name,
+            'age': teacher.age,
             'email': teacher.email,
             'teacher_class': {
                 'id': teacher.teacher_class.id,
@@ -25,6 +26,7 @@ def json_teachers(teachers: list[Teacher]) -> list[dict]:
             #     for subject in teacher.subjects
             # ]
         }
+
         response_data.append(teacher_json)
 
     return response_data

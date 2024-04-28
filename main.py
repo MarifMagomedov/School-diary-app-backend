@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette import status
 
 from database.methods import Database
 from auth.routes import router as auth_router

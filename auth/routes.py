@@ -5,6 +5,7 @@ from .schemas import UserRegisterForm
 
 
 router = APIRouter(
+    tags=['auth'],
     prefix="/auth",
 )
 

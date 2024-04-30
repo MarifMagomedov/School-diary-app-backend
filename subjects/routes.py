@@ -1,22 +1,23 @@
 from fastapi import APIRouter
 
+from database.dto.subject import BaseSubjectModel
+from database.dto.teacher import TeacherModel
 from database.methods import Database
 from database.models import Subject
-from json_data.subjects import json_subjects
-from json_data.teachers import json_teachers
+
 
 router = APIRouter(
-    prefix="/subjects",
+    tags=['subject'], prefix="/subjects",
 )
 
 
 @router.get("/{subject_id}/teachers")
-async def get_subject_teachers(subject_id: int):
+async def get_subject_teachers(subject_id: int) -> list[TeacherModel]:
     teachers = await Database.get_subject_teachers(subject_id)
-    return json_teachers(teachers)
+    return [TeacherModel.model_validate(row, from_attributes=True) for row in teachers]
 
 
 @router.get('/all')
-async def get_subject_all():
+async def get_subject_all() -> list[BaseSubjectModel]:
     subjects = await Database.get_all_table_items(Subject)
-    return json_subjects(subjects)
+    return [BaseSubjectModel.model_validate(row, from_attributes=True) for row in subjects]

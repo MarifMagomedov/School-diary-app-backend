@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, TypeVar, NewType
 
 from pydantic import UUID4
 from sqlalchemy import ForeignKey

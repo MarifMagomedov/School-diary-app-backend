@@ -11,7 +11,6 @@ class BaseClassModel(BaseModel):
     class_word: str
 
 
-class ManagerPageClassModel(BaseClassModel):
+class ClassModel(BaseClassModel):
     classroom_teacher: Person
     students: list[Person]
-

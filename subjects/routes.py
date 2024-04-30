@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from database.dto.subject import BaseSubjectModel
-from database.dto.teacher import TeacherModel
+from database.dto.teacher import BaseTeacherModel
 from database.methods import Database
 from database.models import Subject
 
@@ -12,9 +12,9 @@ router = APIRouter(
 
 
 @router.get("/{subject_id}/teachers")
-async def get_subject_teachers(subject_id: int) -> list[TeacherModel]:
+async def get_subject_teachers(subject_id: int) -> list[BaseTeacherModel]:
     teachers = await Database.get_subject_teachers(subject_id)
-    return [TeacherModel.model_validate(row, from_attributes=True) for row in teachers]
+    return [BaseTeacherModel.model_validate(row, from_attributes=True) for row in teachers]
 
 
 @router.get('/all')

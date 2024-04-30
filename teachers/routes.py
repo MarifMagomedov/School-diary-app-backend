@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from starlette import status
 
-from database.dto.teacher import TeacherModel
+from database.dto.teacher import BaseTeacherModel
 from database.methods import Database
 from teachers.schemas import AddNewTeacherSchema, EditTeacherSchema
 
@@ -35,6 +35,6 @@ async def add_teacher(form: Annotated[AddNewTeacherSchema, Depends()]) -> JSONRe
     )
 
 
-@router.put('/update', response_model=TeacherModel)
+@router.put('/update', response_model=BaseTeacherModel)
 async def update_teacher(form: Annotated[EditTeacherSchema, Depends()]):
     pass

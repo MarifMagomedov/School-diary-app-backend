@@ -1,22 +1,15 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette import status
 
-from database.methods import Database
-from auth.routes import router as auth_router
-from teachers.routes import router as teacher_router
-from subjects.routes import router as subject_router
-from teachers.routes import router as admin_router
-from classes.routes import router as classes_router
+from api.auth import router as auth_router
+from api.teachers import router as teacher_router
+from api.subject import router as subject_router
+from api.teachers import router as admin_router
+from api.cls import router as classes_router
 
 
 app = FastAPI()
-
-
-@app.get("/")
-async def ping():
-    await Database.create_tables()
 
 
 app.include_router(auth_router)

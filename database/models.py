@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Optional, TypeVar, NewType
-
+from typing import Optional, Type
 from pydantic import UUID4
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
@@ -93,7 +93,8 @@ class Class(Base):
 
     classroom_teacher: Mapped['Teacher'] = relationship(
         back_populates='teacher_class',
-        lazy='subquery'
+        lazy='subquery',
+
     )
     teachers: Mapped[list['Teacher']] = relationship(
         back_populates='classes',
@@ -152,3 +153,5 @@ class StudentSubject(Base):
     student_fk = mapped_column(ForeignKey('students.id'), primary_key=True)
     subject_fk = mapped_column(ForeignKey('subjects.id'), primary_key=True)
 
+
+TypeModels = Type[Teacher | Subject | Student | Class | Mark]

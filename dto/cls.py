@@ -14,3 +14,6 @@ class BaseClassModel(BaseModel):
 class ClassModel(BaseClassModel):
     classroom_teacher: Person
     students: list[Person]
+
+
+type ClassDTO = BaseClassModel | ClassModel

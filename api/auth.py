@@ -1,8 +1,5 @@
 from fastapi import APIRouter
 
-from .utils import register_user
-from .schemas import UserRegisterForm
-
 
 router = APIRouter(
     tags=['auth'],
@@ -16,9 +13,8 @@ async def get_current_user():
 
 
 @router.post("/register")
-async def user_register(user_form: UserRegisterForm):
-    register_response = await register_user(user_form)
-    return register_response
+async def user_register(user_form):
+    pass
 
 
 @router.post("/login")

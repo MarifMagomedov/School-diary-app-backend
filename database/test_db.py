@@ -3,7 +3,7 @@ from random import choice
 from uuid import uuid4
 
 from database.connection import session_factory
-from database.methods import Database
+from database.connection import engine
 from database.models import *
 
 
@@ -89,7 +89,9 @@ def init_students(subjects: list[Subject]):
 
 
 async def init_classes():
-    await Database.create_tables()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
     subjects = init_subjects()
     students, teachers = init_students(subjects)
     marks = init_marks()

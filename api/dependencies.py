@@ -12,3 +12,7 @@ async def get_teacher_service():
 
 async def get_subject_service():
     return services.SubjectService(repositories.SubjectRepository())
+
+
+async def get_student_service():
+    return services.StudentService(repositories.StudentRepository())

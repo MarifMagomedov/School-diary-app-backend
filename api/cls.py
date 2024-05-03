@@ -3,10 +3,12 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import get_class_service
+from api.dependencies import get_class_service, get_student_service
 from dto.cls import BaseClassModel, ClassModel
 from database.models import Class
+from dto.student import StudentModel
 from services import ClassService
+from services.student_service import StudentService
 
 router = APIRouter(
     tags=['class'],
@@ -25,8 +27,7 @@ async def get_all_classes(
 @router.get('/class/{class_id}')
 async def get_one_class(
     class_id: UUID,
-    class_service: Annotated[ClassService, Depends(get_class_service)]
-) -> list[ClassModel]:
-    cls = await class_service.get_class(class_id, ClassModel)
+    class_service: Annotated[ClassService, Depends(get_class_service)],
+) -> ClassModel:
+    cls = await class_service.get_class(class_id, ClassModel, dump=True)
     return cls
-

@@ -1,7 +1,9 @@
 from pydantic import BaseModel
+from dto.person import Person
 
-from database.models import Person
 
-
-class Student(Person, BaseModel):
+class StudentModel(Person):
     pass
+
+
+type StudentDTO = StudentModel

@@ -105,7 +105,8 @@ class Class(Base):
     students: Mapped[list['Student']] = relationship(
         back_populates='student_class',
         uselist=True,
-        cascade='all,delete'
+        cascade='all,delete',
+        lazy = 'subquery',
     )
 
 

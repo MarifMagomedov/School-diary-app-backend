@@ -9,7 +9,7 @@ from dto.teacher import BaseTeacherModel, NewTeacherModel
 from services import SubjectService
 from services.class_service import ClassService
 from services.teacher_service import TeacherService
-from .dependencies import get_teacher_service, get_class_service, get_subject_service
+from utils.dependencies import get_teacher_service, get_class_service, get_subject_service
 
 router = APIRouter(
     prefix="/teachers",

@@ -2,8 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import get_subject_service, get_teacher_service
-from database.models import Subject
+from utils.dependencies import get_subject_service, get_teacher_service
 from dto.subject import BaseSubjectModel
 from dto.teacher import BaseTeacherModel
 from services import TeacherService

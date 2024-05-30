@@ -1,5 +1,4 @@
 from uuid import UUID
-from starlette.exceptions import HTTPException
 
 from database.models import Class
 from errors.class_errors import ClassesErrors

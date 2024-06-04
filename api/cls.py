@@ -3,12 +3,9 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 
-from api.dependencies import get_class_service, get_student_service
+from utils.dependencies import get_class_service
 from dto.cls import BaseClassModel, ClassModel
-from database.models import Class
-from dto.student import StudentModel
 from services import ClassService
-from services.student_service import StudentService
 
 router = APIRouter(
     tags=['class'],

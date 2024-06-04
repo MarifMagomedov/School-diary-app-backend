@@ -2,21 +2,28 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.auth import router as auth_router
-from api.teachers import router as teacher_router
-from api.subject import router as subject_router
-from api.teachers import router as admin_router
-from api.cls import router as classes_router
+from api import (
+    auth_router,
+    teacher_router,
+    student_router,
+    subject_router,
+    classes_router
+)
 
 
-app = FastAPI()
+app = FastAPI(
+    version="1.0",
+    docs_url='/docs',
+    openapi_url='/openapi.json',  # This line solved my issue, in my case it was a lambda function
+    redoc_url=None
+)
 
 
 app.include_router(auth_router)
-app.include_router(admin_router)
 app.include_router(teacher_router)
 app.include_router(subject_router)
 app.include_router(classes_router)
+app.include_router(student_router)
 
 
 origins = [

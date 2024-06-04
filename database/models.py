@@ -79,7 +79,6 @@ class Student(Base, Person):
     student_class: Mapped['Class'] = relationship(
         back_populates='students',
         uselist=False,
-        cascade='all,delete'
     )
     class_fk: Mapped[int] = mapped_column(ForeignKey('classes.id'), nullable=True)
 
@@ -94,19 +93,18 @@ class Class(Base):
     classroom_teacher: Mapped['Teacher'] = relationship(
         back_populates='teacher_class',
         lazy='subquery',
-
     )
+
     teachers: Mapped[list['Teacher']] = relationship(
         back_populates='classes',
         uselist=True,
         secondary='teacher_classes',
-        cascade='all,delete'
     )
+
     students: Mapped[list['Student']] = relationship(
         back_populates='student_class',
         uselist=True,
-        cascade='all,delete',
-        lazy = 'subquery',
+        lazy='subquery',
     )
 
 

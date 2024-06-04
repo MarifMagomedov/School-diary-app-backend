@@ -27,6 +27,6 @@ class ClassService:
         cls = await self.repository.get_one(class_id)
         return await self.model_dump(cls, dto_model) if dump else cls
 
-    async def get_all_classes(self, dto_model: ClassDTO):
+    async def get_all_classes(self, dto_model: ClassDTO) -> list[ClassDTO]:
         classes = await self.repository.get_all()
         return await self.dump_classes(classes, dto_model)

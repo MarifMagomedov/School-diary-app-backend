@@ -1,5 +1,4 @@
 from uuid import UUID
-
 from pydantic import BaseModel
 
 from .person import Person
@@ -12,7 +11,7 @@ class BaseClassModel(BaseModel):
 
 
 class ClassModel(BaseClassModel):
-    classroom_teacher: Person
+    classroom_teacher: Person | None = None
     students: list[Person]
 
 

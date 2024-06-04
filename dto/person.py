@@ -1,10 +1,8 @@
-from uuid import UUID
-
-from pydantic import BaseModel
+from pydantic import BaseModel, UUID4
 
 
 class Person(BaseModel):
-    id: UUID
+    id: UUID4
     name: str
     surname: str
     middle_name: str

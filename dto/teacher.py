@@ -10,7 +10,7 @@ class BaseTeacherModel(Person):
 
 
 class NewTeacherModel(BaseTeacherModel):
-    id: None = Field(default_factory=lambda: uuid4())
+    id: UUID = Field(default_factory=lambda: uuid4())
     subjects: int
     teacher_class: UUID | None = None
 

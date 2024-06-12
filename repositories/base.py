@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from pydantic import UUID4
-from sqlalchemy import select
+from sqlalchemy import select, update
 
 from database.connection import session_factory
 from database.models import TypeModels
@@ -29,7 +29,7 @@ class BaseRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, item_id: int | UUID4):
+    async def update(self, item_id: int | UUID4, kwargs):
         raise NotImplementedError
 
 
@@ -44,7 +44,9 @@ class SqlAlchemyRepository(BaseRepository):
 
     async def get_all(self):
         async with self.session_factory() as session:
+            print(session)
             query = select(self.model)
+            print(query)
             items = await session.execute(query)
             return items.unique().scalars().all()
 
@@ -56,6 +58,7 @@ class SqlAlchemyRepository(BaseRepository):
             item = self.model(**form)
             session.add(item)
             await session.commit()
+            return item
 
     async def delete(self, item_id: int | UUID4) -> None:
         async with self.session_factory() as session:
@@ -63,5 +66,9 @@ class SqlAlchemyRepository(BaseRepository):
             await session.delete(deleting_item)
             await session.commit()
 
-    async def update(self, item_id: int, **kwargs):
-        pass
+    async def update(self, item_id: int, kwargs):
+        async with self.session_factory() as session:
+            query = update(self.model).where(self.model.id == item_id).values(kwargs)
+            print(query)
+            await session.execute(query)
+            await session.commit()

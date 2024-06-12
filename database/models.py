@@ -31,18 +31,16 @@ class Subject(Base):
     students: Mapped[list['Student']] = relationship(
         back_populates='subjects',
         secondary='student_subjects',
-        uselist=False,
-        cascade='all,delete'
+        uselist=False
     )
     marks: Mapped[list['Mark']] = relationship(
-        back_populates='subject', uselist=True, cascade='all,delete'
+        back_populates='subject', uselist=True
     )
     teachers: Mapped[list['Teacher']] = relationship(
         back_populates='subjects',
         uselist=True,
         secondary='teacher_subjects',
-        lazy='joined',
-        cascade='all, delete'
+        lazy='subquery'
     )
     teacher_fk: Mapped[int] = mapped_column(ForeignKey('teachers.id'), nullable=True)
 
@@ -69,16 +67,19 @@ class Student(Base, Person):
     subjects: Mapped[list['Subject']] = relationship(
         back_populates='students',
         secondary='student_subjects',
-        uselist=True
+        uselist=True,
+        lazy='selectin'
     )
     marks: Mapped[list['Mark']] = relationship(
         back_populates='student',
         uselist=True,
-        cascade='all,delete'
+        lazy='selectin'
     )
     student_class: Mapped['Class'] = relationship(
         back_populates='students',
         uselist=False,
+        lazy='selectin'
+
     )
     class_fk: Mapped[int] = mapped_column(ForeignKey('classes.id'), nullable=True)
 
@@ -94,13 +95,11 @@ class Class(Base):
         back_populates='teacher_class',
         lazy='subquery',
     )
-
     teachers: Mapped[list['Teacher']] = relationship(
         back_populates='classes',
         uselist=True,
         secondary='teacher_classes',
     )
-
     students: Mapped[list['Student']] = relationship(
         back_populates='student_class',
         uselist=True,
@@ -116,18 +115,18 @@ class Teacher(Base, Person):
     subjects: Mapped[list['Subject']] = relationship(
         back_populates='teachers',
         secondary='teacher_subjects',
-        uselist=True
+        uselist=True,
+        lazy='joined'
     )
     classes: Mapped[list['Class']] = relationship(
         back_populates='teachers',
         uselist=False,
         secondary='teacher_classes',
-        cascade='all,delete',
-        lazy='subquery'
+        lazy='selectin'
     )
     teacher_class: Mapped['Class'] = relationship(
         back_populates='classroom_teacher',
-        lazy='subquery'
+        lazy='selectin'
     )
     class_fk: Mapped[Optional[int]] = mapped_column(ForeignKey('classes.id'), nullable=True)
 
@@ -153,4 +152,4 @@ class StudentSubject(Base):
     subject_fk = mapped_column(ForeignKey('subjects.id'), primary_key=True)
 
 
-TypeModels = Type[Teacher | Subject | Student | Class | Mark]
+type TypeModels = Teacher | Subject | Student | Class | Mark

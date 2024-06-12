@@ -1,7 +1,7 @@
-from uuid import UUID
+from pydantic import UUID4
 
 from database.models import Class
-from errors.class_errors import ClassesErrors
+from utils.errors.class_errors import ClassesNotFoundError
 from repositories.base import BaseRepository
 from dto.cls import ClassDTO
 
@@ -13,7 +13,7 @@ class ClassService:
     @staticmethod
     async def _check_classes(classes):
         if not classes:
-            raise ClassesErrors.classes_not_found_error
+            raise ClassesNotFoundError()
 
     @staticmethod
     async def model_dump(db_model: Class, dto_model: ClassDTO) -> ClassDTO:
@@ -24,7 +24,7 @@ class ClassService:
 
     async def get_class(
         self,
-        class_id: UUID,
+        class_id: UUID4,
         dto_model: ClassDTO = None,
         dump: bool = False
     ) -> Class | ClassDTO:
@@ -36,3 +36,9 @@ class ClassService:
         classes = await self.repository.get_all()
         await self._check_classes(classes)
         return await self.dump_classes(classes, dto_model)
+
+    async def update_class(self, class_id: UUID4, **update_data) -> None:
+        await self.repository.update(class_id, **update_data)
+
+    async def update_class_teacher(self, class_id: UUID4, teacher_id: UUID4):
+        await self.repository.update_class_teacher(class_id, teacher_id)

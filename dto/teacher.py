@@ -1,18 +1,19 @@
-from uuid import uuid4, UUID
-from pydantic import Field
+from uuid import uuid4
+from pydantic import Field, UUID4
 
 from .cls import BaseClassModel
 from .person import Person
+from .subject import BaseSubjectModel
 
 
 class BaseTeacherModel(Person):
     teacher_class: BaseClassModel | None = None
+    subjects: list[BaseSubjectModel]
 
 
 class NewTeacherModel(BaseTeacherModel):
-    id: UUID = Field(default_factory=lambda: uuid4())
+    id: UUID4 = Field(default_factory=lambda: uuid4())
     subjects: int
-    teacher_class: UUID | None = None
 
 
 type TeacherDTO = NewTeacherModel | BaseTeacherModel

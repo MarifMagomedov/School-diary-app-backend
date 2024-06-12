@@ -1,4 +1,4 @@
-from uuid import UUID, uuid4
+from pydantic import UUID4
 
 from database.models import Teacher
 from dto.teacher import BaseTeacherModel, NewTeacherModel
@@ -20,8 +20,19 @@ class TeacherService:
         teachers = await self.repository.get_all()
         return await self.dump_teachers(teachers)
 
-    async def delete_teacher(self, teacher_id: UUID):
+    async def delete_teacher(self, teacher_id: UUID4):
         return await self.repository.delete(teacher_id)
 
-    async def add_teacher(self, form: NewTeacherModel):
+    async def add_teacher(self, form: NewTeacherModel) -> Teacher:
         await self.repository.add_item(form.model_dump())
+
+    async def get_free_teachers(self) -> list[BaseTeacherModel]:
+        teachers = await self.repository.get_all()
+        return list(filter(lambda x: x.teacher_class is None, teachers))
+
+    async def get_teacher(self, teacher_id: UUID4, dump: bool = False) -> Teacher | BaseTeacherModel:
+        teacher = await self.repository.get_one(teacher_id)
+        return self.model_dump(teacher) if dump else teacher
+
+    async def update_teacher(self, teacher_id: UUID4, **update_data):
+        await self.repository.update(teacher_id, **update_data)

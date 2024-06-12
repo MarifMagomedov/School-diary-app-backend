@@ -1,10 +1,13 @@
 from uuid import uuid4
 
-from database.connection import session_factory
-from dto.teacher import BaseTeacherModel
+from pydantic import UUID4
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+
 from .base import SqlAlchemyRepository
 from database.models import Teacher, Subject, Class
 
 
 class TeacherRepository(SqlAlchemyRepository):
     model = Teacher
+

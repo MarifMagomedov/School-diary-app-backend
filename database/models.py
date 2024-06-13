@@ -34,13 +34,14 @@ class Subject(Base):
         uselist=False
     )
     marks: Mapped[list['Mark']] = relationship(
-        back_populates='subject', uselist=True
+        back_populates='subject',
+        uselist=True
     )
     teachers: Mapped[list['Teacher']] = relationship(
         back_populates='subjects',
         uselist=True,
         secondary='teacher_subjects',
-        lazy='subquery'
+        lazy='selectin'
     )
     teacher_fk: Mapped[int] = mapped_column(ForeignKey('teachers.id'), nullable=True)
 
@@ -68,7 +69,6 @@ class Student(Base, Person):
         back_populates='students',
         secondary='student_subjects',
         uselist=True,
-        lazy='selectin'
     )
     marks: Mapped[list['Mark']] = relationship(
         back_populates='student',
@@ -78,8 +78,6 @@ class Student(Base, Person):
     student_class: Mapped['Class'] = relationship(
         back_populates='students',
         uselist=False,
-        lazy='selectin'
-
     )
     class_fk: Mapped[int] = mapped_column(ForeignKey('classes.id'), nullable=True)
 
@@ -93,12 +91,12 @@ class Class(Base):
 
     classroom_teacher: Mapped['Teacher'] = relationship(
         back_populates='teacher_class',
-        lazy='subquery',
+        lazy='selectin',
     )
     teachers: Mapped[list['Teacher']] = relationship(
         back_populates='classes',
         uselist=True,
-        secondary='teacher_classes',
+        secondary='teacher_classes'
     )
     students: Mapped[list['Student']] = relationship(
         back_populates='student_class',

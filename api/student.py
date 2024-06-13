@@ -43,7 +43,7 @@ async def get_class_students(
 async def delete_student(
     student_id: UUID4,
     student_service: Annotated[StudentService, Depends(get_student_service)]
-) -> StudentModel:
+) -> JSONResponse:
     await student_service.delete_student(student_id)
     return JSONResponse(
         status_code=200,

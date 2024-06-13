@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from pydantic import UUID4
 from starlette import status
 
-from dto.teacher import BaseTeacherModel, NewTeacherModel
+from dto.teacher import BaseTeacherModel, NewTeacherModel, UpdateTeacherModel
 from services import SubjectService
 from services.class_service import ClassService
 from services.teacher_service import TeacherService
@@ -64,10 +64,14 @@ async def add_teacher(
     )
 
 
-@router.put('/update', response_model=BaseTeacherModel)
+@router.put('/{teacher_id}', response_model=BaseTeacherModel)
 async def update_teacher(
-    form: Annotated[BaseTeacherModel, Depends()],
-    teacher_service: Annotated[TeacherService, Depends(get_teacher_service)],
-    class_service: Annotated[ClassService, Depends(get_class_service)]
-):
-    pass
+    teacher_id: UUID4,
+    form: UpdateTeacherModel,
+    teacher_service: Annotated[TeacherService, Depends(get_teacher_service)]
+) -> JSONResponse:
+    await teacher_service.update_teacher(teacher_id, form)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={'message': 'Teacher edit successfully'}
+    )

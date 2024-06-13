@@ -36,9 +36,6 @@ class StudentService:
         await self.repository.add_item(form.model_dump())
 
     async def update_student(self, student_id: UUID4, update_data: UpdateStudentModel) -> None:
-        print(update_data.student_class)
-        print(update_data.subjects)
-        print(update_data.student_class or update_data.subjects)
         if update_data.student_class or update_data.subjects:
             return await self.repository.update_with_cls_and_subjects(student_id, update_data)
         return await self.repository.update(student_id,  update_data.model_dump(exclude_none=True))

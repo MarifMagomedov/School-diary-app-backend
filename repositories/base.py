@@ -17,10 +17,6 @@ class BaseRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_filter(self):
-        raise NotImplementedError
-
-    @abstractmethod
     async def add_item(self, form):
         raise NotImplementedError
 
@@ -44,14 +40,9 @@ class SqlAlchemyRepository(BaseRepository):
 
     async def get_all(self):
         async with self.session_factory() as session:
-            print(session)
             query = select(self.model)
-            print(query)
             items = await session.execute(query)
             return items.unique().scalars().all()
-
-    async def get_by_filter(self):
-        pass
 
     async def add_item(self, form):
         async with self.session_factory() as session:
@@ -69,6 +60,5 @@ class SqlAlchemyRepository(BaseRepository):
     async def update(self, item_id: int, kwargs):
         async with self.session_factory() as session:
             query = update(self.model).where(self.model.id == item_id).values(kwargs)
-            print(query)
             await session.execute(query)
             await session.commit()

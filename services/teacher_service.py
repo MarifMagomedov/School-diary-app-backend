@@ -1,7 +1,7 @@
 from pydantic import UUID4
 
 from database.models import Teacher
-from dto.teacher import BaseTeacherModel, NewTeacherModel
+from dto.teacher import BaseTeacherModel, NewTeacherModel, UpdateTeacherModel
 from repositories.base import BaseRepository
 
 
@@ -34,5 +34,5 @@ class TeacherService:
         teacher = await self.repository.get_one(teacher_id)
         return self.model_dump(teacher) if dump else teacher
 
-    async def update_teacher(self, teacher_id: UUID4, **update_data):
-        await self.repository.update(teacher_id, **update_data)
+    async def update_teacher(self, teacher_id: UUID4, update_data: UpdateTeacherModel):
+        await self.repository.update(teacher_id, update_data)

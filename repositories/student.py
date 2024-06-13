@@ -47,7 +47,8 @@ class StudentRepository(SqlAlchemyRepository):
             if update_data.student_class:
                 cls = await session.get(Class, update_data.student_class)
                 student.student_class = cls
-            for subject_id in update_data.subjects:
-                subject = await session.get(Subject, subject_id)
-                student.subjects.append(subject)
+            if student.subjects:
+                for subject_id in update_data.subjects:
+                    subject = await session.get(Subject, subject_id)
+                    student.subjects.append(subject)
             await session.commit()

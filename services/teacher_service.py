@@ -1,8 +1,10 @@
 from pydantic import UUID4
 
 from database.models import Teacher
+from dto.auth import RegisterModel
 from dto.teacher import BaseTeacherModel, NewTeacherModel, UpdateTeacherModel
 from repositories.base import BaseRepository
+import utils.errors.teacher_errors as errors
 
 
 class TeacherService:
@@ -36,3 +38,15 @@ class TeacherService:
 
     async def update_teacher(self, teacher_id: UUID4, update_data: UpdateTeacherModel):
         await self.repository.update(teacher_id, update_data)
+
+    async def check_by_register_code(self, register_code: str) -> Teacher:
+        teacher = await self.repository.get_by_attribute(self.repository.model.register_code, register_code)
+        if not teacher:
+            return errors.TeacherNotFoundError()
+        return teacher
+
+    async def update_registered(self, form: dict, teacher_id: UUID4) -> None:
+        await self.repository.update(teacher_id, form)
+
+    async def get_by_email(self, email: str) -> Teacher:
+        return await self.repository.get_by_attribute(self.repository.model.email, email)

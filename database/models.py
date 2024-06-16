@@ -1,5 +1,7 @@
 from datetime import datetime
-from typing import Optional, Type
+from typing import Optional
+from uuid import uuid4
+
 from pydantic import UUID4
 
 from sqlalchemy import ForeignKey
@@ -16,10 +18,31 @@ class Person:
     vk: Mapped[str] = mapped_column(nullable=True)
     telegram: Mapped[str] = mapped_column(nullable=True)
     registered: Mapped[bool] = mapped_column(default=False)
+    register_code: Mapped[UUID4] = mapped_column(unique=True, nullable=True)
+    role: Mapped[int] = mapped_column(ForeignKey('roles.id'))
 
 
 class Base(DeclarativeBase):
     pass
+
+
+class Role(Base):
+    __tablename__ = 'roles'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str]
+
+
+class School(Base):
+    __tablename__ = 'schools'
+
+    id: Mapped[UUID4] = mapped_column(primary_key=True)
+
+
+class Manager(Base, Person):
+    __tablename__ = 'managers'
+
+    id: Mapped[UUID4] = mapped_column(primary_key=True)
+    school: Mapped[UUID4] = mapped_column(ForeignKey('schools.id'))
 
 
 class Subject(Base):
@@ -27,6 +50,7 @@ class Subject(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     subject_name: Mapped[str]
+    school: Mapped[UUID4] = mapped_column(ForeignKey('schools.id'))
 
     students: Mapped[list['Student']] = relationship(
         back_populates='subjects',
@@ -64,11 +88,13 @@ class Student(Base, Person):
 
     id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
     private: Mapped[bool] = mapped_column(default=False)
+    school: Mapped[UUID4] = mapped_column(ForeignKey('schools.id'))
 
     subjects: Mapped[list['Subject']] = relationship(
         back_populates='students',
         secondary='student_subjects',
         uselist=True,
+        lazy='selectin'
     )
     marks: Mapped[list['Mark']] = relationship(
         back_populates='student',
@@ -88,6 +114,7 @@ class Class(Base):
     id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
     class_number: Mapped[int]
     class_word: Mapped[str]
+    school: Mapped[UUID4] = mapped_column(ForeignKey('schools.id'))
 
     classroom_teacher: Mapped['Teacher'] = relationship(
         back_populates='teacher_class',
@@ -109,6 +136,7 @@ class Teacher(Base, Person):
     __tablename__ = 'teachers'
 
     id: Mapped[UUID4] = mapped_column(primary_key=True, unique=True)
+    school: Mapped[UUID4] = mapped_column(ForeignKey('schools.id'))
 
     subjects: Mapped[list['Subject']] = relationship(
         back_populates='teachers',

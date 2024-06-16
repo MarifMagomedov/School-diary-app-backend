@@ -16,3 +16,11 @@ async def get_subject_service():
 
 async def get_student_service():
     return services.StudentService(repositories.StudentRepository())
+
+
+async def get_auth_service():
+    return services.AuthService()
+
+
+async def get_manager_service():
+    return services.ManagerService(repositories.ManagerRepository())

@@ -1,6 +1,5 @@
 import asyncio
 from random import choice
-from uuid import uuid4
 
 from database.connection import session_factory
 from database.connection import engine
@@ -28,6 +27,34 @@ subjects_names = [
     'Физика', 'Физическая культура', "Программирование",
 ]
 
+sch_id = uuid4()
+school = School(id=sch_id)
+role_teacher = Role(id=1, name='teacher')
+role_student = Role(id=2, name='student')
+role_manager = Role(id=3, name='manager')
+manager = Manager(
+    id=uuid4(),
+    school=school.id,
+    name=choice(names),
+    surname=choice(surnames),
+    middle_name=choice(middle_names),
+    age=choice(range(1, 100)),
+    role=3,
+    register_code=uuid4()
+)
+
+
+async def init_school_and_roles():
+    async with session_factory() as session:
+        session.add(school)
+        await session.commit()
+        session.add(role_student)
+        session.add(role_teacher)
+        session.add(role_manager)
+        await session.commit()
+        session.add(manager)
+        await session.commit()
+
 
 def init_marks():
     marks = []
@@ -47,7 +74,8 @@ def init_subjects():
     subjects = []
     for subject in subjects_names:
         subject = Subject(
-            subject_name=subject
+            subject_name=subject,
+            school=sch_id
         )
         subjects.append(subject)
     return subjects
@@ -67,7 +95,10 @@ def init_students(subjects: list[Subject]):
             name=name,
             surname=surname,
             middle_name=middle_name,
-            age=choice(range(16, 20))
+            age=choice(range(16, 20)),
+            role=2,
+            school=sch_id,
+            register_code=uuid4()
         )
         students.append(student)
 
@@ -82,6 +113,9 @@ def init_students(subjects: list[Subject]):
             surname=surname,
             middle_name=middle_name,
             age=choice(range(30, 70)),
+            role=1,
+            school=sch_id,
+            register_code=uuid4()
         )
         teacher.subjects.append(subject)
         teachers.append(teacher)
@@ -89,29 +123,31 @@ def init_students(subjects: list[Subject]):
 
 
 async def init_classes():
+    global school
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await init_school_and_roles()
 
-    subjects = init_subjects()
-    students, teachers = init_students(subjects)
-    marks = init_marks()
-
-    for i in range(len(students)):
-        students[i].subjects = subjects
-
-    m_i = 0
-    for student in students:
-        for subject in student.subjects:
-            marks_count = choice(range(1, 7))
-            new_marks = marks[m_i: m_i + marks_count]
-            m_i += marks_count
-            subject.marks = new_marks
-            student.marks.extend(new_marks)
-
-    number = [10, 10, 10, 11, 11, 11]
-    words = ['А', "Б", "В", 'А', "Б", "В"]
-    classes = []
     async with session_factory() as session:
+        subjects = init_subjects()
+        students, teachers = init_students(subjects)
+        marks = init_marks()
+
+        for i in range(len(students)):
+            students[i].subjects = subjects
+
+        m_i = 0
+        for student in students:
+            for subject in student.subjects:
+                marks_count = choice(range(1, 7))
+                new_marks = marks[m_i: m_i + marks_count]
+                m_i += marks_count
+                subject.marks = new_marks
+                student.marks.extend(new_marks)
+
+        number = [10, 10, 10, 11, 11, 11]
+        words = ['А', "Б", "В", 'А', "Б", "В"]
+        classes = []
         for number, word, teacher in zip(number, words, teachers):
             s = [students.pop() for i in range(10)]
             _class = Class(
@@ -119,6 +155,7 @@ async def init_classes():
                 class_number=number,
                 class_word=word,
                 classroom_teacher=teacher,
+                school=sch_id
             )
             for i in s:
                 _class.students.append(i)

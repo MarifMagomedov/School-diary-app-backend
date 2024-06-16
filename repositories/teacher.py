@@ -1,5 +1,5 @@
 from pydantic import UUID4
-from sqlalchemy import update
+from sqlalchemy import update, select
 
 from dto.teacher import UpdateTeacherModel
 from .base import SqlAlchemyRepository
@@ -17,8 +17,16 @@ class TeacherRepository(SqlAlchemyRepository):
                 teacher.subjects = new_subjects
                 update_data.subjects = None
                 await session.commit()
-            query = update(self.model).where(
-                self.model.id == teacher_id
-            ).values(**update_data.model_dump(exclude_none=True))
-            await session.execute(query)
-            await session.commit()
+            update_data = update_data.model_dump(exclude_none=True)
+            if update_data:
+                query = update(self.model).where(
+                    self.model.id == teacher_id
+                ).values(**update_data)
+                await session.execute(query)
+                await session.commit()
+    #
+    # async def get_by_register_code(self, register_code):
+    #     async with self.session_factory() as session:
+    #         query = select(Teacher).where(Teacher.register_code == register_code)
+    #         teachers = await session.execute(query)
+    #         return teachers.scalar_one()

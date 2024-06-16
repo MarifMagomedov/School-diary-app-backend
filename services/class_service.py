@@ -1,19 +1,13 @@
 from pydantic import UUID4
 
 from database.models import Class
-from utils.errors.class_errors import ClassesNotFoundError
 from repositories.base import BaseRepository
-from dto.cls import ClassDTO
+from dto.cls import ClassDTO, AddClassModel
 
 
 class ClassService:
     def __init__(self, repository: BaseRepository):
         self.repository = repository
-
-    @staticmethod
-    async def _check_classes(classes):
-        if not classes:
-            raise ClassesNotFoundError()
 
     @staticmethod
     async def model_dump(db_model: Class, dto_model: ClassDTO) -> ClassDTO:
@@ -29,12 +23,10 @@ class ClassService:
         dump: bool = False
     ) -> Class | ClassDTO:
         cls = await self.repository.get_one(class_id)
-        await self._check_classes(cls)
         return await self.model_dump(cls, dto_model) if dump else cls
 
     async def get_all_classes(self, dto_model: ClassDTO) -> list[ClassDTO]:
         classes = await self.repository.get_all()
-        await self._check_classes(classes)
         return await self.dump_classes(classes, dto_model)
 
     async def update_class(self, class_id: UUID4, **update_data) -> None:
@@ -42,3 +34,7 @@ class ClassService:
 
     async def update_class_teacher(self, class_id: UUID4, teacher_id: UUID4):
         await self.repository.update_class_teacher(class_id, teacher_id)
+
+    async def add_class(self, form: AddClassModel):
+        await self.repository.add_item(form.model_dump())
+

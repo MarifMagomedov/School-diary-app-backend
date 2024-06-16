@@ -1,5 +1,5 @@
 from database.models import Subject
-from dto.subject import BaseSubjectModel
+from dto.subject import BaseSubjectModel, AddSubjectModel
 from repositories.base import BaseRepository
 
 
@@ -21,3 +21,6 @@ class SubjectService:
     async def get_all_subjects(self) -> list[Subject]:
         subjects = await self.repository.get_all()
         return await self.dump_subjects(subjects)
+
+    async def add_subject(self, form: AddSubjectModel):
+        await self.repository.add_item(form.model_dump())

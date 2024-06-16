@@ -2,10 +2,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 from pydantic import UUID4
+from starlette import status
+from starlette.responses import JSONResponse
 
 from dto.teacher import BaseTeacherModel
 from utils.dependencies import get_class_service, get_teacher_service
-from dto.cls import BaseClassModel, ClassModel
+from dto.cls import BaseClassModel, ClassModel, AddClassModel
 from services import ClassService, TeacherService
 
 router = APIRouter(
@@ -36,8 +38,20 @@ async def update_class_teacher(
     class_id: UUID4,
     teacher_id: UUID4,
     teacher_service: Annotated[TeacherService, Depends(get_teacher_service)],
-    class_service: Annotated[ClassService, Depends(get_class_service)],
+    class_service: Annotated[ClassService, Depends(get_class_service)]
 ) -> BaseTeacherModel:
     await class_service.update_class_teacher(class_id, teacher_id)
     teacher = await teacher_service.get_teacher(teacher_id)
     return await teacher_service.model_dump(teacher)
+
+
+@router.post('/add')
+async def add_class(
+    form: AddClassModel,
+    class_service: Annotated[ClassService, Depends(get_class_service)]
+) -> JSONResponse:
+    await class_service.add_class(form)
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={'message': 'Class added successfully'}
+    )

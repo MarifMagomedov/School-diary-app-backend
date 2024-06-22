@@ -26,6 +26,12 @@ subjects_names = [
     'История', 'ОБЖ', 'Русский язык', 'Английский язык',
     'Физика', 'Физическая культура', "Программирование",
 ]
+homeworks = [
+    'Прочитать текст и написать краткое изложение', 'Выучить стих Есенина',
+    'Принести рисунок птички', 'Потрогать траву'
+    'Решать 15 задание егэ', 'Подготовиться к контрольной работе',
+    'Сочинение по тексту Ноунейма', 'Сдать игэ па барьба'
+]
 
 sch_id = uuid4()
 school = School(id=sch_id)
@@ -42,6 +48,26 @@ manager = Manager(
     role=3,
     register_code=uuid4()
 )
+
+
+async def init_schedules_data(subjects: list[Subject], students: list[Student]):
+    schedules = []
+    dates = [datetime(2024, 6, i) for i in range(1, 6)]
+    s_id = 1
+    for i in range(1, 6):
+        z = []
+        for j in range(1, 6):
+            s_r = ScheduleRow(
+                id=s_id,
+                subject=subjects[j],
+                students=students,
+                homework=Homework(id=s_id, description=choice(homeworks)),
+            )
+            s_id += 1
+            z.append(s_r)
+        s = Schedule(id=s_id, date=dates[i - 1], rows=z)
+        schedules.append(s)
+    return schedules
 
 
 async def init_school_and_roles():
@@ -132,6 +158,8 @@ async def init_classes():
         subjects = init_subjects()
         students, teachers = init_students(subjects)
         marks = init_marks()
+        schedules = await init_schedules_data(subjects, students)
+        session.add_all(schedules)
 
         for i in range(len(students)):
             students[i].subjects = subjects

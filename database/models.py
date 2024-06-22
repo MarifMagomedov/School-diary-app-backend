@@ -45,6 +45,62 @@ class Manager(Base, Person):
     school: Mapped[UUID4] = mapped_column(ForeignKey('schools.id'))
 
 
+class Homework(Base):
+    __tablename__ = 'homeworks'
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    description: Mapped[str]
+
+    schedule_row: Mapped['ScheduleRow'] = relationship(
+        back_populates='homework',
+        uselist=False,
+        lazy='selectin'
+    )
+    schedule_row_fk: Mapped[UUID4] = mapped_column(ForeignKey('schedule_rows.id'))
+
+
+class ScheduleRow(Base):
+    __tablename__ = 'schedule_rows'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+
+    homework: Mapped['Homework'] = relationship(
+        back_populates='schedule_row',
+        uselist=False,
+        lazy='selectin'
+    )
+    subject: Mapped['Subject'] = relationship(
+        back_populates='schedules_rows',
+        uselist=False,
+        lazy='selectin'
+    )
+    students: Mapped[list['Student']] = relationship(
+        back_populates='schedules_rows',
+        uselist=True,
+        secondary='schedule_students',
+        lazy='selectin'
+    )
+    schedule: Mapped['Schedule'] = relationship(
+        back_populates='rows',
+        uselist=False,
+        lazy='selectin'
+    )
+    subject_fk: Mapped[int] = mapped_column(ForeignKey('subjects.id'))
+    schedule_fk: Mapped[int] = mapped_column(ForeignKey('schedules.id'))
+
+
+class Schedule(Base):
+    __tablename__ = 'schedules'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    date: Mapped[datetime] = mapped_column(autoincrement=True)
+
+    rows: Mapped[list['ScheduleRow']] = relationship(
+        back_populates='schedule',
+        uselist=True,
+        lazy='selectin'
+    )
+
+
 class Subject(Base):
     __tablename__ = 'subjects'
 
@@ -59,12 +115,18 @@ class Subject(Base):
     )
     marks: Mapped[list['Mark']] = relationship(
         back_populates='subject',
-        uselist=True
+        uselist=True,
+        lazy='selectin'
     )
     teachers: Mapped[list['Teacher']] = relationship(
         back_populates='subjects',
         uselist=True,
         secondary='teacher_subjects',
+        lazy='selectin'
+    )
+    schedules_rows: Mapped[list['ScheduleRow']] = relationship(
+        back_populates='subject',
+        uselist=True,
         lazy='selectin'
     )
     teacher_fk: Mapped[int] = mapped_column(ForeignKey('teachers.id'), nullable=True)
@@ -104,6 +166,12 @@ class Student(Base, Person):
     student_class: Mapped['Class'] = relationship(
         back_populates='students',
         uselist=False,
+    )
+    schedules_rows: Mapped[list['ScheduleRow']] = relationship(
+        back_populates='students',
+        uselist=True,
+        secondary='schedule_students',
+        lazy='selectin'
     )
     class_fk: Mapped[int] = mapped_column(ForeignKey('classes.id'), nullable=True)
 
@@ -176,6 +244,13 @@ class StudentSubject(Base):
 
     student_fk = mapped_column(ForeignKey('students.id'), primary_key=True)
     subject_fk = mapped_column(ForeignKey('subjects.id'), primary_key=True)
+
+
+class ScheduleStudent(Base):
+    __tablename__ = 'schedule_students'
+
+    schedule_fk = mapped_column(ForeignKey('schedule_rows.id'), primary_key=True)
+    student_fk = mapped_column(ForeignKey('students.id'), primary_key=True)
 
 
 type TypeModels = Teacher | Subject | Student | Class | Mark

@@ -4,3 +4,4 @@ from services.class_service import ClassService
 from services.subject_service import SubjectService
 from services.auth_service import AuthService
 from services.manager_service import ManagerService
+from services.schedule_service import ScheduleService

@@ -1,7 +1,6 @@
 from pydantic import UUID4
 
 from database.models import Student
-from dto.auth import RegisterModel
 from repositories.base import BaseRepository
 from dto.student import StudentDTO, StudentModel, AddStudentModel, UpdateStudentModel
 import utils.errors.student_errors as errors
@@ -28,7 +27,6 @@ class StudentService:
         return await self.model_dump(student, dto_model) if dump else student
 
     async def get_students_from_class(self, class_id: UUID4) -> list[StudentModel]:
-        # students = await self.repository.get_students_from_class(class_id)
         students = await self.repository.get_by_attribute(self.repository.model.student_class, class_id)
         return await self.dump_students(students)
 

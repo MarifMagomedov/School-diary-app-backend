@@ -24,3 +24,7 @@ async def get_auth_service():
 
 async def get_manager_service():
     return services.ManagerService(repositories.ManagerRepository())
+
+
+async def get_schedule_service():
+    return services.ScheduleService(repositories.ScheduleRepository())

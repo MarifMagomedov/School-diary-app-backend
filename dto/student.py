@@ -22,4 +22,4 @@ class UpdateStudentModel(BaseModel):
     subjects: list[int] | None = None
 
 
-type StudentDTO = StudentModel
+type StudentDTO = StudentModel | UpdateStudentModel | AddStudentModel

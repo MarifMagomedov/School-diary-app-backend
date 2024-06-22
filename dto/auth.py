@@ -14,3 +14,9 @@ class LoginModel(BaseModel):
     role: int
     email: str
     password: str
+
+
+class TokenModel(BaseModel):
+    token: str
+    user_role: int
+    user_id: UUID4

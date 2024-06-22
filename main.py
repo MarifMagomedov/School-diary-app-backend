@@ -1,9 +1,12 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
 from api import *
-from utils.middlewares import CurrentUserMiddleware
+from api.auth import get_current_user
+
+
+PROTECTED = Depends(get_current_user)
 
 app = FastAPI(
     openapi_url='/openapi.json'
@@ -11,11 +14,11 @@ app = FastAPI(
 
 
 app.include_router(auth_router)
-app.include_router(teacher_router)
-app.include_router(subject_router)
-app.include_router(classes_router)
-app.include_router(student_router)
-app.include_router(manager_router)
+app.include_router(teacher_router, dependencies=[PROTECTED])
+app.include_router(subject_router, dependencies=[PROTECTED])
+app.include_router(classes_router, dependencies=[PROTECTED])
+app.include_router(student_router, dependencies=[PROTECTED])
+app.include_router(manager_router, dependencies=[PROTECTED])
 
 
 origins = [
@@ -30,7 +33,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(CurrentUserMiddleware)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 from pydantic import BaseModel, UUID4
 
+from dto.marks import BaseMarkModel
+
 
 class BaseSubjectModel(BaseModel):
     id: int
@@ -8,3 +10,7 @@ class BaseSubjectModel(BaseModel):
 
 class AddSubjectModel(BaseModel):
     subject_name: str
+
+
+class SubjectInScheduleModel(BaseSubjectModel):
+    marks: list[BaseMarkModel]

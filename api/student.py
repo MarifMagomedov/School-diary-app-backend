@@ -5,9 +5,10 @@ from pydantic import UUID4
 from starlette import status
 from starlette.responses import JSONResponse
 
+from dto.schedule import ScheduleModel
 from dto.student import StudentModel, AddStudentModel, UpdateStudentModel
-from services import StudentService, ClassService
-from utils.dependencies import get_student_service, get_class_service
+from services import StudentService, ClassService, ScheduleService
+from utils.dependencies import get_student_service, get_class_service, get_schedule_service
 
 router = APIRouter(
     tags=['students'],
@@ -66,3 +67,11 @@ async def update_student(
             "message": "Student edit successfully"
         }
     )
+
+
+@router.get('/{student_id}/schedule')
+async def get_student_schedule(
+    schedule_service: Annotated[ScheduleService, Depends(get_schedule_service)],
+    student_id: UUID4,
+) -> list[ScheduleModel]:
+    return await schedule_service.get_student_schedule(student_id)

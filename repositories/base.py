@@ -33,7 +33,7 @@ class BaseRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_by_attribute(self, item_id: UUID4, attribute, value: str | UUID4):
+    async def update_by_attribute(self, item_id: UUID4, attribute, value):
         raise NotImplementedError
 
 

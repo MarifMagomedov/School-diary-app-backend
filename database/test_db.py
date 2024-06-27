@@ -28,7 +28,7 @@ subjects_names = [
 ]
 homeworks = [
     'Прочитать текст и написать краткое изложение', 'Выучить стих Есенина',
-    'Принести рисунок птички', 'Потрогать траву'
+    'Принести рисунок птички', 'Потрогать траву',
     'Решать 15 задание егэ', 'Подготовиться к контрольной работе',
     'Сочинение по тексту Ноунейма', 'Сдать игэ па барьба'
 ]
@@ -62,6 +62,7 @@ async def init_schedules_data(subjects: list[Subject], students: list[Student]):
                 subject=subjects[j],
                 students=students,
                 homework=Homework(id=s_id, description=choice(homeworks)),
+                date=dates[i - 1]
             )
             s_id += 1
             z.append(s_r)

@@ -41,13 +41,7 @@ async def register_user(
     form.update({'registered': True})
     await service.update_registered(form, user.id)
 
-    return JSONResponse(
-        status_code=status.HTTP_201_CREATED,
-        content={
-            'message': 'Вы успешно зарегистрировались',
-            'token': token,
-        }
-    )
+    return TokenModel(token=token, user_role=user.role, user_id=user.id)
 
 
 @router.post("/login")

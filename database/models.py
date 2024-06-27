@@ -4,8 +4,10 @@ from uuid import uuid4
 
 from pydantic import UUID4
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, ARRAY, String
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
+
+from database.connection import engine
 
 
 class Person:
@@ -47,8 +49,10 @@ class Manager(Base, Person):
 
 class Homework(Base):
     __tablename__ = 'homeworks'
+
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     description: Mapped[str]
+    additional_files = mapped_column(ARRAY(String), nullable=True)
 
     schedule_row: Mapped['ScheduleRow'] = relationship(
         back_populates='homework',
@@ -62,6 +66,7 @@ class ScheduleRow(Base):
     __tablename__ = 'schedule_rows'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    end_date: Mapped[datetime]
 
     homework: Mapped['Homework'] = relationship(
         back_populates='schedule_row',
@@ -84,6 +89,7 @@ class ScheduleRow(Base):
         uselist=False,
         lazy='selectin'
     )
+
     subject_fk: Mapped[int] = mapped_column(ForeignKey('subjects.id'))
     schedule_fk: Mapped[int] = mapped_column(ForeignKey('schedules.id'))
 

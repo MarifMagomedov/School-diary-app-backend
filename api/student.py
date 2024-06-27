@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile, File, Body
 from typing import Annotated
 
 from pydantic import UUID4
 from starlette import status
 from starlette.responses import JSONResponse
 
-from dto.schedule import ScheduleModel
+from dto.schedule import ScheduleModel, ScheduleRowModel
 from dto.student import StudentModel, AddStudentModel, UpdateStudentModel
 from services import StudentService, ClassService, ScheduleService
 from utils.dependencies import get_student_service, get_class_service, get_schedule_service
@@ -69,9 +69,33 @@ async def update_student(
     )
 
 
-@router.get('/{student_id}/schedule')
+@router.get('/{student_id}/schedule/{year}/{week}')
 async def get_student_schedule(
     schedule_service: Annotated[ScheduleService, Depends(get_schedule_service)],
     student_id: UUID4,
+    year: int,
+    week: int,
 ) -> list[ScheduleModel]:
-    return await schedule_service.get_student_schedule(student_id)
+    return await schedule_service.get_student_schedule(student_id, year, week)
+
+
+@router.get('/{student_id}/schedule/{year}/{week}/rows')
+async def get_student_schedule_rows(
+    schedule_service: Annotated[ScheduleService, Depends(get_schedule_service)],
+    student_id: UUID4,
+    year: int,
+    week: int,
+) -> list[ScheduleRowModel]:
+    return await schedule_service.get_student_schedule_rows(student_id, year, week)
+
+# @router.post('/{student_id}/homework/{homework_id}')
+# async def done_homework(
+#     homework_id: int,
+#     homework_service: Annotated[HomeworkService, Depends(get_homework_service)],
+#     files: list[UploadFile] = File(...),
+# ):
+#     await homework_service.upload_homework_files(homework_id, files)
+#     return JSONResponse(
+#         status_code=status.HTTP_200_OK,
+#         content={'message': 'Домашнее задание загружено'}
+#     )
